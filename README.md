@@ -1,5 +1,6 @@
 # K-9 — Defensive APT Mitigation Toolkit
 
+<<<<<<< HEAD
 K-9 is a defensive PowerShell toolkit that scans Windows endpoints for common persistence tricks, suspicious in-memory activity, and network tampering. It is designed for authorized laboratory environments and blue-team sandboxes where rapid situational awareness matters more than stealth.
 
 The current build ships with a **session-aware terminal UI**, per-module telemetry, and a firmware posture audit so analysts can capture a full “mission debrief” for every run.
@@ -33,10 +34,37 @@ K-9_Script/
 ```
 
 ## Quick Start
+=======
+K-9 is a defensive PowerShell toolkit designed to detect, report, and (optionally) mitigate common APT-like behaviours in authorized, laboratory, or controlled environments. The project is under active development.
+
+This repository contains the core script(s) for quick forensic checks, heuristic detection of persistence mechanisms and suspicious activity, and a safe remediation mode that is disabled by default.
+
+## Important disclaimer
+
+- K-9 is intended for use in test labs, sandboxes, and on systems for which you have explicit written permission.  
+- Do not run this software on production systems without prior authorization. Improper use can disrupt services.  
+- The authors accept no liability for damage or data loss resulting from misuse.
+
+## Features (Draft)
+
+- Quick heuristic scan for common persistence mechanisms: Services, Scheduled Tasks, Run Keys, and WMI persistence.  
+- Process and network behaviour heuristics to surface suspicious indicators.  
+- Dry-run mode is the default and reports actions without changing the system.  
+- Optional remediation actions gated behind explicit confirmation.  
+- Audit logging and JSON report export.  
+- CI-friendly: includes Pester tests and PSScriptAnalyzer integration (suggested).
+
+> Note: Feature set will expand as development continues. See the roadmap in `CHANGELOG.md`.
+
+## Installation
+
+Clone the repository and import the module or run the script directly:
+>>>>>>> origin/main
 
 ```powershell
 git clone https://github.com/m4rba4s/K-9_Script.git
 cd K-9_Script
+<<<<<<< HEAD
 
 # Run with full interactive experience
 pwsh .\K9.ps1
@@ -87,3 +115,9 @@ See `CHANGELOG.md` for progress once available.
 Released under the MIT License. See `LICENSE` for details.
 
 Stay paranoid. 🐾
+=======
+# Import as module (if you provide a psm1)
+Import-Module .\K9.psm1
+# Or execute the script directly
+pwsh .\K9.ps1 -ScanQuick -DryRun
+>>>>>>> origin/main
