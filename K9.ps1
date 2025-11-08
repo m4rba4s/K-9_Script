@@ -4,6 +4,7 @@ param(
     [switch]$Memory,
     [switch]$Network,
     [switch]$Firmware,
+    [switch]$Forensics,
     [switch]$All,
     [switch]$NoBanner
 )
@@ -15,11 +16,14 @@ if (-not $NoBanner) {
 }
 
 $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+. "$PSScriptRoot\modules\K9Utils.ps1"
+. "$PSScriptRoot\modules\K9State.ps1"
 . "$PSScriptRoot\modules\VenomUI.ps1"
 . "$PSScriptRoot\modules\RegistryReaper.ps1"
 . "$PSScriptRoot\modules\MemoryHunter.ps1"
 . "$PSScriptRoot\modules\NetworkNinja.ps1"
 . "$PSScriptRoot\modules\FirmwarePhantom.ps1"
+. "$PSScriptRoot\modules\ForensicsWarden.ps1"
 
 Initialize-K9Session -ShowBanner:$(-not $NoBanner)
 
@@ -51,6 +55,13 @@ $moduleDefinitions = @(
         Aliases     = @('firmware', 'fw')
         Description = 'Firmware posture audit & boot integrity check (requires admin)'
         Action      = { Invoke-FirmwareScan }
+    }
+    [PSCustomObject]@{
+        Key         = '5'
+        Name        = 'ForensicsWarden'
+        Aliases     = @('forensics', 'vm', 'disk')
+        Description = 'Disk/VM artifact hunt, tunnel binaries & mission snapshot'
+        Action      = { Invoke-ForensicsScan }
     }
 )
 
@@ -128,6 +139,7 @@ if ($All) {
     if ($Memory)   { $requestedModules += Resolve-K9Module -Selection 'memory' }
     if ($Network)  { $requestedModules += Resolve-K9Module -Selection 'network' }
     if ($Firmware) { $requestedModules += Resolve-K9Module -Selection 'firmware' }
+    if ($Forensics){ $requestedModules += Resolve-K9Module -Selection 'forensics' }
 }
 
 $requestedModules = @(

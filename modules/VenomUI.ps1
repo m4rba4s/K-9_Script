@@ -24,6 +24,10 @@ function Initialize-K9Session {
         [switch]$ShowBanner
     )
 
+    if (Get-Command Initialize-K9State -ErrorAction SilentlyContinue) {
+        Initialize-K9State
+    }
+
     $script:K9SessionData = [ordered]@{
         SessionId   = ('K9-' + (Get-Random -Minimum 100000 -Maximum 999999))
         StartTime   = Get-Date
@@ -166,6 +170,7 @@ function Show-K9Summary {
     if ($session.ModuleRuns.Count -eq 0) {
         Write-Host " No modules were executed in this session." -ForegroundColor Yellow
         Write-Host "=============================================================" -ForegroundColor DarkCyan
+        Show-K9PostSummary
         return
     }
 
@@ -180,6 +185,35 @@ function Show-K9Summary {
     Write-Host $table -ForegroundColor Gray
     Write-Host "=============================================================" -ForegroundColor DarkCyan
     Write-Host ""
+
+    Show-K9PostSummary
+}
+
+function Show-K9PostSummary {
+    $score = $null
+    try { $score = Get-K9Scoreboard } catch {}
+
+    if ($score -and $score.Indicators.Count -gt 0) {
+        Write-Host "[Threat Score]" -ForegroundColor DarkYellow
+        Write-Host ("  Total: {0}" -f $score.Total) -ForegroundColor Gray
+        $score.Indicators |
+            Sort-Object Points -Descending |
+            Select-Object -First 5 |
+            ForEach-Object {
+                Write-Host ("  - ({0} pts) [{1}] {2} :: {3}" -f $_.Points, $_.Module, $_.Indicator, $_.Detail) -ForegroundColor Gray
+            }
+        Write-Host ""
+    }
+
+    $tips = $null
+    try { $tips = Get-K9Tips } catch {}
+    if ($tips -and $tips.Count -gt 0) {
+        Write-Host "[Operator Tips]" -ForegroundColor Cyan
+        foreach ($entry in $tips.GetEnumerator()) {
+            Write-Host ("  - {0}" -f $entry.Value) -ForegroundColor Gray
+        }
+        Write-Host ""
+    }
 }
 
 function Write-HostSuccess {
