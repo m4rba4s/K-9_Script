@@ -7,6 +7,10 @@ function Invoke-ForensicsScan {
 
         [string[]]$Roots,
 
+        [string[]]$YaraRoots,
+
+        [string[]]$TunnelRoots,
+
         [switch]$SkipSnapshot
     )
 
@@ -21,6 +25,18 @@ function Invoke-ForensicsScan {
         if ($validRoots.Count -gt 0) {
             $profile.Roots = $validRoots
         }
+    }
+
+    if ($YaraRoots -and $YaraRoots.Count -gt 0) {
+        $profile.YaraRoots = @(
+            $YaraRoots | Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and (Test-Path $_) }
+        )
+    }
+
+    if ($TunnelRoots -and $TunnelRoots.Count -gt 0) {
+        $profile.TunnelRoots = @(
+            $TunnelRoots | Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and (Test-Path $_) }
+        )
     }
 
     Write-HostInfo ("Profile: {0}" -f $profile.Scope)

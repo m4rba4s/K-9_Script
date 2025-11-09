@@ -5,8 +5,11 @@ param(
     [switch]$Network,
     [switch]$Firmware,
     [switch]$Forensics,
+    [switch]$Driver,
     [switch]$All,
-    [switch]$NoBanner
+    [switch]$NoBanner,
+    [string]$ReportPath,
+    [switch]$Deep
 )
 
 Set-StrictMode -Version Latest
@@ -24,8 +27,11 @@ $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 . "$PSScriptRoot\modules\NetworkNinja.ps1"
 . "$PSScriptRoot\modules\FirmwarePhantom.ps1"
 . "$PSScriptRoot\modules\ForensicsWarden.ps1"
+. "$PSScriptRoot\modules\DriverSentinel.ps1"
 
-Initialize-K9Session -ShowBanner:$(-not $NoBanner)
+Initialize-K9Session -ShowBanner:$(-not $NoBanner) -ReportPath $ReportPath
+
+$script:K9DriverOptions = @{ Deep = $Deep }
 
 $moduleDefinitions = @(
     [PSCustomObject]@{
@@ -62,6 +68,13 @@ $moduleDefinitions = @(
         Aliases     = @('forensics', 'vm', 'disk')
         Description = 'Disk/VM artifact hunt, tunnel binaries & mission snapshot'
         Action      = { Invoke-ForensicsScan }
+    }
+    [PSCustomObject]@{
+        Key         = '6'
+        Name        = 'DriverSentinel'
+        Aliases     = @('driver', 'drv')
+        Description = 'BYOVD/DLL sideload detection & driver baseline'
+        Action      = { Invoke-DriverSentinel -Deep:$script:K9DriverOptions.Deep }
     }
 )
 
@@ -140,6 +153,7 @@ if ($All) {
     if ($Network)  { $requestedModules += Resolve-K9Module -Selection 'network' }
     if ($Firmware) { $requestedModules += Resolve-K9Module -Selection 'firmware' }
     if ($Forensics){ $requestedModules += Resolve-K9Module -Selection 'forensics' }
+    if ($Driver)   { $requestedModules += Resolve-K9Module -Selection 'driver' }
 }
 
 $requestedModules = @(

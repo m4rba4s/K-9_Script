@@ -1,0 +1,11 @@
+FileName,SHA256,Description,Publisher
+capcom.sys,,Capcom signed driver abused for kernel shellcode,Capcom
+mhyprot2.sys,,Genshin Impact anti-cheat driver exposes arbitrary R/W,miHoYo
+gdrv.sys,,Gigabyte motherboard driver allows physical memory access,Giga-Byte Technology
+rtcore64.sys,,MSI Afterburner driver with unrestricted MSR/IO access,Micro-Star International
+dbutil_2_3.sys,,Dell BIOS utility driver vulnerable to privilege escalation,Dell
+aswArPot.sys,,Avast anti-rootkit driver abused for unsigned loads,Avast Software
+rzpnk.sys,,Razer driver side-load enables kernel primitives,Razer
+iqvw64e.sys,,Intel Ethernet diagnostics driver exposes IOCTL primitives,Intel
+phylock.sys,,StorageCraft Volume Snapshot driver bypasses security software,StorageCraft Technology
+speedfan.sys,,SpeedFan driver exposes arbitrary IO operations,Almico Software

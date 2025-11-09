@@ -14,6 +14,8 @@ Set-Location $projectRoot
 . "$projectRoot\modules\ForensicsWarden.ps1"
 . "$projectRoot\modules\NetworkNinja.ps1"
 . "$projectRoot\modules\RegistryReaper.ps1"
+. "$projectRoot\modules\MemoryHunter.ps1"
+. "$projectRoot\modules\DriverSentinel.ps1"
 
 function Invoke-SmokeStep {
     param(
@@ -48,6 +50,11 @@ $rr = Invoke-SmokeStep -Name 'RegistryReaper' -Action {
 }
 $results.Add($rr) | Out-Null
 
+$mh = Invoke-SmokeStep -Name 'MemoryHunter' -Action {
+    Invoke-MemoryScan
+}
+$results.Add($mh) | Out-Null
+
 if (-not $SkipNetwork) {
     $net = Invoke-SmokeStep -Name 'NetworkNinja' -Action {
         Invoke-NetworkScan
@@ -56,9 +63,14 @@ if (-not $SkipNetwork) {
 }
 
 $fw = Invoke-SmokeStep -Name 'ForensicsWarden Minimal' -Action {
-    Invoke-ForensicsScan -Scope Minimal -Roots @(Get-Location) -SkipSnapshot
+    Invoke-ForensicsScan -Scope Minimal -Roots @(Get-Location) -YaraRoots @(Get-Location) -SkipSnapshot
 }
 $results.Add($fw) | Out-Null
+
+$drv = Invoke-SmokeStep -Name 'DriverSentinel (quick)' -Action {
+    Invoke-DriverSentinel -SkipEventAudit
+}
+$results.Add($drv) | Out-Null
 
 $resultsArray = $results.ToArray()
 $failed = $resultsArray | Where-Object { $_ -and $_.PSObject.Properties['Status'] -and $_.Status -ne 'PASS' }

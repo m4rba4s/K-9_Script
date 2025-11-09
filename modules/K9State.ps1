@@ -8,6 +8,7 @@ $script:K9Settings = $null
 function Initialize-K9State {
     Reset-K9Scoreboard
     Reset-K9Tips
+    $script:K9Report = @()
     Get-K9DataRoot | Out-Null
     Get-K9Settings | Out-Null
 }
@@ -301,6 +302,39 @@ function Set-K9SettingValue {
     $file = Get-K9SettingsFile
     try {
         $settings | ConvertTo-Json -Depth 6 | Out-File -FilePath $file -Encoding UTF8
+        return $true
+    } catch {
+        return $false
+    }
+}
+$script:K9Report = @()
+function Add-K9ReportEntry {
+    param(
+        [Parameter(Mandatory = $true)][string]$Module,
+        [Parameter(Mandatory = $true)][string]$Indicator,
+        [Parameter()][object]$Data
+    )
+
+    if (-not $script:K9Report -or -not ($script:K9Report -is [System.Collections.IList])) {
+        $script:K9Report = New-Object System.Collections.Generic.List[object]
+    }
+
+    $script:K9Report.Add([PSCustomObject]@{
+        Module    = $Module
+        Indicator = $Indicator
+        Timestamp = Get-Date
+        Data      = $Data
+    }) | Out-Null
+}
+
+function Export-K9Report {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path
+    )
+
+    try {
+        $json = $script:K9Report | ConvertTo-Json -Depth 6
+        $json | Out-File -FilePath $Path -Encoding UTF8
         return $true
     } catch {
         return $false

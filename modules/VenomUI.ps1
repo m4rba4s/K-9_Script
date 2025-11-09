@@ -21,7 +21,8 @@ function Show-Banner {
 
 function Initialize-K9Session {
     param(
-        [switch]$ShowBanner
+        [switch]$ShowBanner,
+        [string]$ReportPath
     )
 
     if (Get-Command Initialize-K9State -ErrorAction SilentlyContinue) {
@@ -35,6 +36,7 @@ function Initialize-K9Session {
         PowerShell  = $PSVersionTable.PSVersion.ToString()
         HostName    = $env:COMPUTERNAME
         UserName    = $env:USERNAME
+        ReportPath  = $ReportPath
     }
 
     $script:K9ModuleOverride = $null
@@ -187,6 +189,14 @@ function Show-K9Summary {
     Write-Host ""
 
     Show-K9PostSummary
+
+    if ($session.ReportPath) {
+        if (Export-K9Report -Path $session.ReportPath) {
+            Write-HostSuccess ("JSON report saved to {0}" -f $session.ReportPath)
+        } else {
+            Write-HostWarning ("Failed to write JSON report to {0}" -f $session.ReportPath)
+        }
+    }
 }
 
 function Show-K9PostSummary {
